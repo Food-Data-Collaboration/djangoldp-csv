@@ -1,0 +1,3 @@
+MIDDLEWARE = []
+INSTALLED_APPS = []
+SECRET_KEY = "supersecret"

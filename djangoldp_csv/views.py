@@ -35,10 +35,6 @@ class CSVImportView(APIView):
 
         try:
             model_type = self.resolve_model_type(request)
-        except KeyError:
-            return Response(
-                {"error": "No model-type was passed with the CSV"}, status=400
-            )
         except ObjectDoesNotExist:
             return Response(
                 {"error": "No model could be found with the requested type"}, status=404

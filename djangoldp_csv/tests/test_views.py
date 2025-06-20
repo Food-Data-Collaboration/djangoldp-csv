@@ -19,12 +19,15 @@ class TestCSVImportView(APITestCase):
         )
         self.client.force_authenticate(self.user)
 
+    def open_test_csv(self):
+        csv_path = os.path.join(os.path.dirname(__file__), "import.csv")
+        return open(csv_path)
+
     def test_import_csv(self):
         """Uploading the test CSV to POST djangoldp-csv-import."""
         self.setUpLoggedInUser(is_staff=True)
 
-        csv_path = os.path.join(os.path.dirname(__file__), "import.csv")
-        with open(csv_path) as f:
+        with self.open_test_csv() as f:
             response = self.client.post(
                 reverse("djangoldp-csv-import") + "?model-type=dfc-b%3ASuppliedProduct",
                 {"csv": f},
@@ -36,3 +39,38 @@ class TestCSVImportView(APITestCase):
         assert p.urlid == "http://test.host/suppliedproducts/1/"
         assert p.name == "Example"
         assert p.has_type == ProductType.EXAMPLE_PRODUCT
+
+    def test_import_csv_no_model_type_passed(self):
+        self.setUpLoggedInUser(is_staff=True)
+
+        with self.open_test_csv() as f:
+            response = self.client.post(reverse("djangoldp-csv-import"), {"csv": f})
+            assert response.status_code == 404
+            assert (
+                response.data["error"]
+                == "No model could be found with the requested type"
+            )
+
+    def test_import_csv_model_type_does_not_exist(self):
+        self.setUpLoggedInUser(is_staff=True)
+
+        with self.open_test_csv() as f:
+            response = self.client.post(
+                reverse("djangoldp-csv-import") + "?model-type=dfc-b%3ADoesNotExist",
+                {"csv": f},
+            )
+            assert response.status_code == 404
+            assert (
+                response.data["error"]
+                == "No model could be found with the requested type"
+            )
+
+    def test_import_csv_not_staff(self):
+        self.setUpLoggedInUser(is_staff=False)
+
+        with self.open_test_csv() as f:
+            response = self.client.post(
+                reverse("djangoldp-csv-import") + "?model-type=dfc-b%3ASuppliedProduct",
+                {"csv": f},
+            )
+            assert response.status_code == 403

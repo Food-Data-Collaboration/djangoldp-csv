@@ -16,6 +16,6 @@ from django.test.runner import DiscoverRunner
 
 test_runner = DiscoverRunner(verbosity=1)
 
-failures = test_runner.run_tests([])
+failures = test_runner.run_tests(["djangoldp_csv.tests.test_views"])
 if failures:
     sys.exit(failures)

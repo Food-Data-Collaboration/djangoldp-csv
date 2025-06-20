@@ -33,6 +33,7 @@ class SuppliedProduct(Model):
         choices=ProductType.choices,
         blank=True,
         null=True,
+        max_length=255,
     )
 
     class Meta(Model.Meta):

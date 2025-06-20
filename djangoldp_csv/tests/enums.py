@@ -1,7 +1,7 @@
 from django.db import models
 
 
-DFC_PT_URL = "https://raw.githubusercontent.com/datafoodconsortium/taxonomies/refs/heads/main/productTypes.rdf"
+DFC_PT_URL = "https://github.com/datafoodconsortium/taxonomies/releases/latest/download/productTypes.rdf"
 
 
 class ProductType(models.TextChoices):

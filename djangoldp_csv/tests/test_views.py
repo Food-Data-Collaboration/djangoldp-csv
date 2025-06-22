@@ -32,13 +32,18 @@ class TestCSVImportView(APITestCase):
                 reverse("djangoldp-csv-import") + "?model-type=dfc-b%3ASuppliedProduct",
                 {"csv": f},
             )
-            assert response.status_code == 201
+            assert response.status_code == 200
 
         # Exactly one product is created and it has the fields from the CSV.
         p = SuppliedProduct.objects.get()
         assert p.urlid == "http://test.host/suppliedproducts/1/"
         assert p.name == "Example"
         assert p.has_type == ProductType.EXAMPLE_PRODUCT
+
+    def test_import_csv_none_passed(self):
+        self.setUpLoggedInUser(is_staff=True)
+        response = self.client.post(reverse("djangoldp-csv-import"))
+        assert response.status_code == 400
 
     def test_import_csv_no_model_type_passed(self):
         self.setUpLoggedInUser(is_staff=True)

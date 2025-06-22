@@ -3,10 +3,12 @@ import io
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render
+from djangoldp.models import Model
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from djangoldp.models import Model
+from djangoldp_csv.forms import CSVImportForm
 
 
 logger = logging.getLogger("djangoldp")
@@ -27,11 +29,13 @@ class CSVImportView(APIView):
             return model_type
         raise ObjectDoesNotExist()
 
+    def get(self, request, *args, **kwargs):
+        return render(request, "csv_import.html", {"form": CSVImportForm()})
+
     def post(self, request, *args, **kwargs):
-        if "csv" not in request.FILES:
-            return Response(
-                {"error": "csv-import is a required parameter"}, status_code=400
-            )
+        form = CSVImportForm(request.POST, request.FILES)
+        if not form.is_valid():
+            return Response(form.errors, status=400)
 
         try:
             model_type = self.resolve_model_type(request)
@@ -59,4 +63,6 @@ class CSVImportView(APIView):
             rows_to_create.append(instance)
 
         model_type.objects.bulk_create(rows_to_create)
-        return Response(status=201)
+        return render(
+            request, "csv_import.html", {"form": CSVImportForm(), "success": True}
+        )

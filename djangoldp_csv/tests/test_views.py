@@ -8,14 +8,14 @@ from djangoldp_csv.tests.models import SuppliedProduct
 
 
 class TestCSVImportView(APITestCase):
-    def setUpLoggedInUser(self, is_staff=False):
+    def setUpLoggedInUser(self, **kwargs):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             username="john",
             email="jlennon@beatles.com",
             password="glass onion",
             first_name="John",
-            is_staff=is_staff,
+            **kwargs,
         )
         self.client.force_authenticate(self.user)
 
@@ -25,7 +25,7 @@ class TestCSVImportView(APITestCase):
 
     def test_import_csv(self):
         """Uploading the test CSV to POST djangoldp-csv-import."""
-        self.setUpLoggedInUser(is_staff=True)
+        self.setUpLoggedInUser(is_superuser=True)
 
         with self.open_test_csv() as f:
             response = self.client.post(
@@ -41,12 +41,12 @@ class TestCSVImportView(APITestCase):
         assert p.has_type == ProductType.EXAMPLE_PRODUCT
 
     def test_import_csv_none_passed(self):
-        self.setUpLoggedInUser(is_staff=True)
+        self.setUpLoggedInUser(is_superuser=True)
         response = self.client.post(reverse("djangoldp-csv-import"))
         assert response.status_code == 400
 
     def test_import_csv_no_model_type_passed(self):
-        self.setUpLoggedInUser(is_staff=True)
+        self.setUpLoggedInUser(is_superuser=True)
 
         with self.open_test_csv() as f:
             response = self.client.post(reverse("djangoldp-csv-import"), {"csv": f})
@@ -57,7 +57,7 @@ class TestCSVImportView(APITestCase):
             )
 
     def test_import_csv_model_type_does_not_exist(self):
-        self.setUpLoggedInUser(is_staff=True)
+        self.setUpLoggedInUser(is_superuser=True)
 
         with self.open_test_csv() as f:
             response = self.client.post(
@@ -70,8 +70,8 @@ class TestCSVImportView(APITestCase):
                 == "No model could be found with the requested type"
             )
 
-    def test_import_csv_not_staff(self):
-        self.setUpLoggedInUser(is_staff=False)
+    def test_import_csv_not_superuser(self):
+        self.setUpLoggedInUser(is_superuser=False, is_staff=True)
 
         with self.open_test_csv() as f:
             response = self.client.post(

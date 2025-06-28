@@ -23,7 +23,7 @@ Of course, sending only one model per csv means that for interconnected models w
 
 ## Security
 
-In order to protect your data, only staff users can access the import view.
+In order to protect your data, only super-users can access the import view (`user.is_superuser`).
 
 ## Testing
 

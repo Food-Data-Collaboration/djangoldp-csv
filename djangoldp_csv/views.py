@@ -5,17 +5,17 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from djangoldp.models import Model
-from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from djangoldp_csv.forms import CSVImportForm
+from djangoldp_csv.permissions import IsSuperuser
 
 
 logger = logging.getLogger("djangoldp")
 
 
 class CSVImportView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsSuperuser]
 
     def resolve_model_type(self, request):
         # Resolve the model type of the CSV file contents.

@@ -49,8 +49,22 @@ class CSVImportView(APIView):
         )
 
         rows_to_create = []
+        rows_to_update = []
+        fields = []
+
         for row in imported_file:
-            instance = model_type()
+            # Fetch instance if it already exists, else create a new row.
+            row_exists = True
+            instance = (
+                model_type.objects.filter(urlid=row["urlid"]).first()
+                if "urlid" in row
+                else None
+            )
+            if instance is None:
+                row_exists = False
+                instance = model_type()
+
+            # Parse RDF properties of row.
             for field in row.keys():
                 model_field = model_type.get_field_from_rdf_type(field)
                 if model_field is None:
@@ -60,9 +74,15 @@ class CSVImportView(APIView):
                     )
                     continue
                 setattr(instance, model_field.name, row[field])
-            rows_to_create.append(instance)
+                fields.append(model_field.name)
+
+            if row_exists:
+                rows_to_update.append(instance)
+            else:
+                rows_to_create.append(instance)
 
         model_type.objects.bulk_create(rows_to_create)
+        model_type.objects.bulk_update(rows_to_update, fields=fields)
         return render(
             request, "csv_import.html", {"form": CSVImportForm(), "success": True}
         )

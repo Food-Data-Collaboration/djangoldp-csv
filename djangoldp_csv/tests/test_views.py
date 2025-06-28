@@ -40,6 +40,22 @@ class TestCSVImportView(APITestCase):
         assert p.name == "Example"
         assert p.has_type == ProductType.EXAMPLE_PRODUCT
 
+        # Re-uploading the CSV will perform a PUT operation.
+        with self.open_test_csv() as f:
+            p.name = "Modified Example"
+            p.save()
+
+            response = self.client.post(
+                reverse("djangoldp-csv-import") + "?model-type=dfc-b%3ASuppliedProduct",
+                {"csv": f},
+            )
+            assert response.status_code == 200
+
+        p = SuppliedProduct.objects.get()
+        assert p.urlid == "http://test.host/suppliedproducts/1/"
+        assert p.name == "Example"
+        assert p.has_type == ProductType.EXAMPLE_PRODUCT
+
     def test_import_csv_none_passed(self):
         self.setUpLoggedInUser(is_superuser=True)
         response = self.client.post(reverse("djangoldp-csv-import"))

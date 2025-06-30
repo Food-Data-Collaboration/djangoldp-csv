@@ -19,8 +19,8 @@ class TestCSVImportView(APITestCase):
         )
         self.client.force_authenticate(self.user)
 
-    def open_test_csv(self):
-        csv_path = os.path.join(os.path.dirname(__file__), "import.csv")
+    def open_test_csv(self, filename="import.csv"):
+        csv_path = os.path.join(os.path.dirname(__file__), filename)
         return open(csv_path)
 
     def test_import_csv(self):
@@ -95,3 +95,15 @@ class TestCSVImportView(APITestCase):
                 {"csv": f},
             )
             assert response.status_code == 403
+
+    def test_import_fieldless_csv(self):
+        # Upload a CSV without any RDF-mapped fields.
+        self.setUpLoggedInUser(is_superuser=True)
+
+        with self.open_test_csv(filename="error-fieldless-test.csv") as f:
+            response = self.client.post(
+                reverse("djangoldp-csv-import") + "?model-type=dfc-b%3ASuppliedProduct",
+                {"csv": f},
+            )
+            assert response.status_code == 400
+            assert SuppliedProduct.objects.count() == 0

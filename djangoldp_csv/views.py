@@ -68,6 +68,17 @@ class CSVImportView(APIView):
         first_row = next(imported_file)
         fields = self._process_csv_fields(model_type, first_row)
 
+        if not len(fields):
+            return Response(
+                {
+                    "error": (
+                        "None of the fields in this CSV could be parsed. "
+                        "Please use URLs to RDF properties as they are configured in the DjangoLDP model"
+                    )
+                },
+                status=400,
+            )
+
         rows_to_create = []
         rows_to_update = []
 

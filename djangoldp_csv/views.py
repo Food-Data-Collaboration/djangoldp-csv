@@ -32,6 +32,22 @@ class CSVImportView(APIView):
     def get(self, request, *args, **kwargs):
         return render(request, "csv_import.html", {"form": CSVImportForm()})
 
+    def _process_csv_fields(self, model, row):
+        """Attempts to resolve a dictionary mapping model field names to RDF properties from the CSV"""
+        fields = {}
+
+        for key in row.keys():
+            model_field = model.get_field_from_rdf_type(key)
+            if model_field is None:
+                # NOTE: A future version of DjangoLDP will provide a JSONField where we can store additional fields.
+                logger.warning(
+                    f"WARN unable to find model field for value {key} on {model}. Not storing this data"
+                )
+                continue
+            fields[model_field.name] = key
+
+        return fields
+
     def post(self, request, *args, **kwargs):
         form = CSVImportForm(request.POST, request.FILES)
         if not form.is_valid():
@@ -48,11 +64,14 @@ class CSVImportView(APIView):
             io.StringIO(request.FILES["csv"].read().decode("utf-8"))
         )
 
+        # Attempt to resolve the fields from the document.
+        first_row = next(imported_file)
+        fields = self._process_csv_fields(model_type, first_row)
+
         rows_to_create = []
         rows_to_update = []
-        fields = []
 
-        for row in imported_file:
+        def process_row(row):
             # Fetch instance if it already exists, else create a new row.
             row_exists = True
             instance = (
@@ -64,25 +83,23 @@ class CSVImportView(APIView):
                 row_exists = False
                 instance = model_type()
 
-            # Parse RDF properties of row.
-            for field in row.keys():
-                model_field = model_type.get_field_from_rdf_type(field)
-                if model_field is None:
-                    # NOTE: A future version of DjangoLDP will provide a JSONField where we can store additional fields.
-                    logger.warning(
-                        f"WARN unable to find model field for value {field} on {model_type}. Not storing this data"
-                    )
-                    continue
-                setattr(instance, model_field.name, row[field])
-                fields.append(model_field.name)
+            for key in fields.keys():
+                setattr(instance, key, row[fields[key]])
 
             if row_exists:
                 rows_to_update.append(instance)
             else:
                 rows_to_create.append(instance)
 
+        # Workaround for performance:
+        # We only want to process the fields once in the CSV, so we used next() once already to process them.
+        # Process this row first and then return to the stream.
+        process_row(first_row)
+        for row in imported_file:
+            process_row(row)
+
         model_type.objects.bulk_create(rows_to_create)
-        model_type.objects.bulk_update(rows_to_update, fields=fields)
+        model_type.objects.bulk_update(rows_to_update, fields=fields.keys())
         return render(
             request, "csv_import.html", {"form": CSVImportForm(), "success": True}
         )

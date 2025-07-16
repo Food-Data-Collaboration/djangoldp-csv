@@ -38,3 +38,14 @@ class SuppliedProduct(Model):
 
     class Meta(Model.Meta):
         rdf_type = "dfc-b:SuppliedProduct"
+
+
+class Enterprise(Model):
+    name = fields.TextField(
+        rdf_type="dfc-b:name",
+        blank=True,
+        null=True,
+    )  # xsd:String
+
+    class Meta(Model.Meta):
+        rdf_type = "dfc-b:Enterprise"

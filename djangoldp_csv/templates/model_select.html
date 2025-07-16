@@ -1,0 +1,9 @@
+<html>
+    <body>
+        <ul>
+            {% for m in model_types %}
+            <li><a href="{{ m.link }}">{{ m.label }}</a></li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>

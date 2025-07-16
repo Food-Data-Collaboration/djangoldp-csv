@@ -1,7 +1,11 @@
-<form method="post" enctype="multipart/form-data" action="?model-type=dfc-b%3ASuppliedProduct">
-    {% csrf_token %}
-    {{ form }}
-    <br/><br/>
-    {% if success %}<p>Form uploaded successfully.</p>{% endif %}
-    <input type="submit" value="Submit">
-</form>
+<html>
+    <body>
+        <form method="post" enctype="multipart/form-data" action="?model-type={{model_type}}">
+            {% csrf_token %}
+            {{ form }}
+            <br/><br/>
+            {% if success %}<p>Form uploaded successfully.</p>{% endif %}
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>

@@ -1,10 +1,11 @@
 import os
 
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 from djangoldp_csv.tests.enums import ProductType
-from djangoldp_csv.tests.models import SuppliedProduct
+from djangoldp_csv.tests.models import Enterprise, SuppliedProduct
 
 
 class TestCSVImportView(APITestCase):
@@ -22,6 +23,41 @@ class TestCSVImportView(APITestCase):
     def open_test_csv(self, filename="import.csv"):
         csv_path = os.path.join(os.path.dirname(__file__), filename)
         return open(csv_path)
+
+    def test_select_model(self):
+        self.setUpLoggedInUser(is_superuser=True)
+
+        response = self.client.get(reverse("djangoldp-csv-import"))
+        assert response.status_code == 200
+        self.assertTemplateUsed(response, "model_select.html")
+
+    @override_settings(DJANGOLDP_CSV_MODELS=["dfc-b:SuppliedProduct"])
+    def test_select_model_excluded(self):
+        self.setUpLoggedInUser(is_superuser=True)
+
+        allowed_url = (
+            reverse("djangoldp-csv-import") + "?model-type=dfc-b%3ASuppliedProduct"
+        )
+        forbidden_url = (
+            reverse("djangoldp-csv-import") + "?model-type=dfc-b%3AEnterprise"
+        )
+
+        response = self.client.get(allowed_url)
+        assert response.status_code == 200
+        self.assertTemplateUsed(response, "csv_import.html")
+
+        response = self.client.get(forbidden_url)
+        assert response.status_code == 200
+        self.assertTemplateUsed(response, "model_select.html")
+
+        with self.open_test_csv() as f:
+            response = self.client.post(forbidden_url, {"csv": f})
+            assert response.status_code == 404
+            assert (
+                response.data["error"]
+                == "No model could be found with the requested type"
+            )
+            assert Enterprise.objects.count() == 0
 
     def test_import_csv(self):
         """Uploading the test CSV to POST djangoldp-csv-import."""

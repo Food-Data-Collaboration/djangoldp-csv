@@ -21,6 +21,8 @@ Each csv must include the data for only one model type, which should be passed u
 
 Of course, sending only one model per csv means that for interconnected models with foreign keys, multiple CSV transmissions are required. In the example above we include urlids corresponding to the `Enterprise` model, with a column for the field `dfc-b:hasAddress`, which could be a foreign key pointing to the model `Address`. When djangoldp-csv parses this file, the `Enterprise` instances will be created along with the `Address` instances and these connections, but only the `urlid` of the Address will be populated. This is valid in DjangoLDP (considered as a reference to an external object which can be retrieved at `http://test.host/api/dfc/addresses/2`), but to populate the fields we would send a second CSV, this time with the `model-type` of the Address model.
 
+There are some example CSVs under the `examples/` directory of this repository. Both examples are based on the Data Food Consortium ontologies and [DjangoLDP package](https://git.startinblox.com/djangoldp-packages/djangoldp-data-food-consortium).
+
 ### CSV Import Model Select
 
 With the correct query parameters you can access the CSV upload for the appropriate model, which means of course that you can include it in your application via an `<a>` element directly. Out-of-the-box this package also supports a view for selecting the model to upload, which can be accessed at the same path simply excluding the query parameter (`/djangoldp-csv/import/`).

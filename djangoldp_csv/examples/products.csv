@@ -1,0 +1,4 @@
+"urlid","dfc-b:suppliedBy","dfc-b:hasType","dfc-b:name","dfc-b:description","dfc-b:URL"
+"https://data-server.cqcm.startinblox.com/api/dfc/products/csv-1","https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-1","https://github.com/datafoodconsortium/taxonomies/releases/latest/download/productTypes.rdf#biscuit","Jammy Dodgers","Great with tea","https://www.tasteofhome.com/recipes/jammy-dodgers/"
+"https://data-server.cqcm.startinblox.com/api/dfc/products/csv-2","https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-1","https://github.com/datafoodconsortium/taxonomies/releases/latest/download/productTypes.rdf#mature-cheese","Gorganzola","Italian blue cheese",NULL
+"https://data-server.cqcm.startinblox.com/api/dfc/products/csv-3","https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-1","https://github.com/datafoodconsortium/taxonomies/releases/latest/download/productTypes.rdf#pasta","Gricia",NULL,NULL

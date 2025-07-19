@@ -1,0 +1,4 @@
+"urlid","dfc-b:addressOf","dfc-b:hasStreet","dfc-b:hasPostalCode","dfc-b:hasCity","dfc-b:hasCountry","dfc-b:latitude","dfc-b:longitude","dfc-b:region"
+"https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-1/addresses/1/","https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-1/","6 Parvis Notre-Dame, Place Jean-Paul II","75004","Paris","France","48.852923","2.349223",NULL
+"https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-2/addresses/1/","https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-2/","Trafalgar Square","WC2N 5DN","London","UnitedKingdom","51.507351","-0.127758",NULL
+"https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-3/addresses/1/","https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-3/","Terrasse Dufferin","G1R 4S2","Québec","Canada","46.810376","-71.204521",NULL

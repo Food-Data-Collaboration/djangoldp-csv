@@ -1,0 +1,4 @@
+"urlid","dfc-b:name","dfc-b:hasDescription","dfc-b:email"
+"https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-1","CSV Imported Farm A","The very first cooperative imported by CSV","hello@example.org"
+"https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-2","CSV Imported Farm B","A close second",NULL
+"https://data-server.cqcm.startinblox.com/api/dfc/enterprises/csv-3","CSV Imported Farm C","Better late than never",NULL

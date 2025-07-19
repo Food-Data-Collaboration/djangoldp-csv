@@ -5,6 +5,7 @@ from urllib import parse
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.shortcuts import render
 from django.urls import reverse
 from djangoldp.models import Model
@@ -159,13 +160,14 @@ class CSVImportView(APIView):
             else:
                 rows_to_create.append(instance)
 
-        # Workaround for performance:
-        # We only want to process the fields once in the CSV, so we used next() once already to process them.
-        # Process this row first and then return to the stream.
-        process_row(first_row)
-        for row in imported_file:
-            process_row(row)
+        with transaction.atomic():
+            # Workaround for performance:
+            # We only want to process the fields once in the CSV, so we used next() once already to process them.
+            # Process this row first and then return to the stream.
+            process_row(first_row)
+            for row in imported_file:
+                process_row(row)
 
-        model_type.objects.bulk_create(rows_to_create)
-        model_type.objects.bulk_update(rows_to_update, fields=fields.keys())
+            model_type.objects.bulk_create(rows_to_create)
+            model_type.objects.bulk_update(rows_to_update, fields=fields.keys())
         return self.render_csv_import(request, success=True)

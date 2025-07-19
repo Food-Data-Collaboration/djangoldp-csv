@@ -76,6 +76,13 @@ class TestCSVImportView(APITestCase):
         assert p.name == "Example"
         assert p.has_type == ProductType.EXAMPLE_PRODUCT
 
+        # An Enterprise should also have been created
+        e = Enterprise.objects.get()
+        assert (
+            e.urlid == "http://localhost:8000/enterprises/1/"
+        )  # value from import.csv
+        assert p.supplied_by == e
+
         # Re-uploading the CSV will perform a PUT operation.
         with self.open_test_csv() as f:
             p.name = "Modified Example"
@@ -91,6 +98,8 @@ class TestCSVImportView(APITestCase):
         assert p.urlid == "http://test.host/suppliedproducts/1/"
         assert p.name == "Example"
         assert p.has_type == ProductType.EXAMPLE_PRODUCT
+
+        assert Enterprise.objects.count() == 1
 
     def test_import_csv_none_passed(self):
         self.setUpLoggedInUser(is_superuser=True)

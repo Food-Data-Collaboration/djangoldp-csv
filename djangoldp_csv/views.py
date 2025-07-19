@@ -140,7 +140,19 @@ class CSVImportView(APIView):
                 instance = model_type()
 
             for key in fields.keys():
-                setattr(instance, key, row[fields[key]])
+                # Handle foreign keys
+                model_field = model_type.get_field_from_rdf_type(key)
+                if model_field.related_model is None:
+                    setattr(instance, key, row[fields[key]])
+                else:
+                    sub_instance = model_field.related_model.objects.get_or_create(
+                        urlid=row[fields[key]]
+                    )[0]
+
+                    if model_field.one_to_many or model_field.many_to_many:
+                        getattr(instance, key).add(sub_instance)
+                    else:
+                        setattr(instance, key, sub_instance)
 
             if row_exists:
                 rows_to_update.append(instance)

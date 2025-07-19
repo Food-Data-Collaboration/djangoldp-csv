@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from djangoldp import fields
 from djangoldp.models import Model
 from djangoldp.permissions import ReadAndCreate, OwnerPermissions
@@ -34,6 +35,15 @@ class SuppliedProduct(Model):
         blank=True,
         null=True,
         max_length=255,
+    )
+    supplied_by = fields.ForeignKey(
+        "Enterprise",
+        rdf_type="dfc-b:suppliedBy",
+        related_rdf_type="dfc-b:supplies",
+        blank=True,
+        null=True,
+        related_name="supplied_products",
+        on_delete=models.SET_NULL,
     )
 
     class Meta(Model.Meta):

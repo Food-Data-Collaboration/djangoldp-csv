@@ -1,2 +1,2 @@
-"urlid","dfc-b:hasType","dfc-b:name"
-"http://test.host/suppliedproducts/1/","https://github.com/datafoodconsortium/taxonomies/releases/latest/download/productTypes.rdf#example-product","Example"
+"urlid","dfc-b:hasType","dfc-b:name","dfc-b:suppliedBy"
+"http://test.host/suppliedproducts/1/","https://github.com/datafoodconsortium/taxonomies/releases/latest/download/productTypes.rdf#example-product","Example","http://localhost:8000/enterprises/1/"

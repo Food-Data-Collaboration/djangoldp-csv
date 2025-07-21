@@ -22,6 +22,9 @@ logger = logging.getLogger("djangoldp")
 class CSVImportView(APIView):
     permission_classes = [IsSuperuser]
 
+    def get_form_class(self, *args, **kwargs):
+        return CSVImportForm(*args, **kwargs)
+
     def resolve_model_type(self, request):
         # Resolve the model type of the CSV file contents.
         # We consider the query parameter and the explicit contents of the CSV file,
@@ -45,7 +48,7 @@ class CSVImportView(APIView):
             request,
             "csv_import.html",
             {
-                "form": CSVImportForm(),
+                "form": self.get_form_class(),
                 "success": success,
                 "model_type": parse.quote_plus(request.GET["model-type"]),
             },
@@ -88,7 +91,7 @@ class CSVImportView(APIView):
         return fields
 
     def post(self, request, *args, **kwargs):
-        form = CSVImportForm(request.POST, request.FILES)
+        form = self.get_form_class(request.POST, request.FILES)
         if not form.is_valid():
             return Response(form.errors, status=400)
 

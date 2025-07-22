@@ -100,12 +100,16 @@ class BaseCSVImportForm(forms.Form):
         model_type.objects.bulk_create(rows_to_create)
         model_type.objects.bulk_update(rows_to_update, fields=fields.keys())
 
+    def file_fields(self):
+        return [
+            field
+            for field in self.visible_fields()
+            if isinstance(field.field, forms.FileField)
+        ]
+
     def process_all_files(self, model_type=None):
-        for field in self.visible_fields():
-            if (
-                isinstance(field.field, forms.FileField)
-                and self.cleaned_data[field.name] is not None
-            ):
+        for field in self.file_fields():
+            if self.cleaned_data[field.name] is not None:
                 self.process_file(field, model_type)
 
 

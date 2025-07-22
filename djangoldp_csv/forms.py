@@ -9,14 +9,12 @@ from djangoldp_csv.errors import FieldParsingError
 logger = logging.getLogger("djangoldp")
 
 
-class CSVImportForm(forms.Form):
+class BaseCSVImportForm(forms.Form):
     """
     Form for parsing CSV files of the format specified by this package.
 
-    A view using this form should call process_all_files after validating the form is clean.
+    A view using children of this form should call process_all_files after validating the form is clean.
     """
-
-    csv = forms.FileField()
 
     def _process_csv_fields(self, model, row):
         """Attempts to resolve a dictionary mapping model field names to RDF properties from the CSV"""
@@ -94,3 +92,9 @@ class CSVImportForm(forms.Form):
         for field in self.visible_fields():
             if isinstance(field.field, forms.FileField):
                 self.process_file(model_type, self.cleaned_data[field.name])
+
+
+class CSVImportForm(BaseCSVImportForm):
+    """Default implementation of CSV import with a single file field"""
+
+    csv = forms.FileField()

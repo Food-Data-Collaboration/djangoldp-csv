@@ -14,11 +14,26 @@ from djangoldp_csv.permissions import IsSuperuser
 from djangoldp_csv.utils import get_all_model_rdf_types
 
 
-class CSVImportView(APIView):
+class BaseCSVImportView(APIView):
+    """
+    A basic view for interfacing with CSV import forms.
+    """
+
     permission_classes = [IsSuperuser]
 
     def get_form_class(self, *args, **kwargs):
         return CSVImportForm(*args, **kwargs)
+
+    def process_form(self, form, model_type=None):
+        with transaction.atomic():
+            form.process_all_files(model_type)
+
+
+class CSVImportView(BaseCSVImportView):
+    """
+    An implementation of CSV import view which allows for model selection,
+    via query parameters and server settings.
+    """
 
     def resolve_model_type(self, request):
         # Resolve the model type of the CSV file contents.
@@ -83,8 +98,7 @@ class CSVImportView(APIView):
         try:
             # Retrieve model configured with given RDF type (if any).
             model_type = self.resolve_model_type(request)
-            with transaction.atomic():
-                form.process_all_files(model_type)
+            self.process_form(form, model_type)
         except FieldParsingError:
             return Response(
                 {

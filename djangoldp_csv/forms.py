@@ -9,6 +9,14 @@ from djangoldp_csv.errors import FieldParsingError
 logger = logging.getLogger("djangoldp")
 
 
+class FileField(forms.FileField):
+    model_type = None
+
+    def __init__(self, *args, **kwargs):
+        self.model_type = kwargs.pop("model_type", None)
+        super().__init__(*args, **kwargs)
+
+
 class BaseCSVImportForm(forms.Form):
     """
     Form for parsing CSV files of the format specified by this package.
@@ -32,8 +40,12 @@ class BaseCSVImportForm(forms.Form):
 
         return fields
 
-    def process_file(self, model_type, file):
-        # file was request.FILES["csv"]
+    def process_file(self, field, model_type=None):
+        file = self.cleaned_data[field.name]
+        if model_type is None:
+            if field.model_type is None:
+                raise ValueError("No model type configured on form or field")
+            model_type = field.model_type
         imported_file = csv.DictReader(io.StringIO(file.read().decode("utf-8")))
 
         # Attempt to resolve the fields from the document.
@@ -88,13 +100,13 @@ class BaseCSVImportForm(forms.Form):
         model_type.objects.bulk_create(rows_to_create)
         model_type.objects.bulk_update(rows_to_update, fields=fields.keys())
 
-    def process_all_files(self, model_type):
+    def process_all_files(self, model_type=None):
         for field in self.visible_fields():
             if isinstance(field.field, forms.FileField):
-                self.process_file(model_type, self.cleaned_data[field.name])
+                self.process_file(field, model_type)
 
 
 class CSVImportForm(BaseCSVImportForm):
     """Default implementation of CSV import with a single file field"""
 
-    csv = forms.FileField()
+    csv = FileField()

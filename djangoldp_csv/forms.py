@@ -102,7 +102,10 @@ class BaseCSVImportForm(forms.Form):
 
     def process_all_files(self, model_type=None):
         for field in self.visible_fields():
-            if isinstance(field.field, forms.FileField):
+            if (
+                isinstance(field.field, forms.FileField)
+                and self.cleaned_data[field.name] is not None
+            ):
                 self.process_file(field, model_type)
 
 

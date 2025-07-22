@@ -43,9 +43,9 @@ class BaseCSVImportForm(forms.Form):
     def process_file(self, field, model_type=None):
         file = self.cleaned_data[field.name]
         if model_type is None:
-            if field.model_type is None:
+            if field.field.model_type is None:
                 raise ValueError("No model type configured on form or field")
-            model_type = field.model_type
+            model_type = field.field.model_type
         imported_file = csv.DictReader(io.StringIO(file.read().decode("utf-8")))
 
         # Attempt to resolve the fields from the document.

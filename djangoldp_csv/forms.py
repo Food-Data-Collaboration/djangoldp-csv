@@ -40,6 +40,10 @@ class BaseCSVImportForm(forms.Form):
 
         return fields
 
+    def get_unique_kwargs(self, urlid):
+        # Hook for subclass in another library.
+        return {"urlid": urlid}
+
     def process_file(self, field, model_type=None):
         file = self.cleaned_data[field.name]
         if model_type is None:
@@ -58,7 +62,9 @@ class BaseCSVImportForm(forms.Form):
         def process_row(row):
             # Fetch instance if it already exists, else create a new row.
             instance = (
-                model_type.objects.filter(urlid=row["urlid"]).first()
+                model_type.objects.filter(
+                    **self.get_unique_kwargs(row["urlid"])
+                ).first()
                 if "urlid" in row
                 else None
             )
@@ -71,9 +77,13 @@ class BaseCSVImportForm(forms.Form):
                 if model_field.related_model is None:
                     setattr(instance, key, row[fields[key]])
                 else:
-                    sub_instance = model_field.related_model.objects.get_or_create(
-                        urlid=row[fields[key]]
-                    )[0]
+                    related_model = model_field.related_model
+                    unique_kwargs = self.get_unique_kwargs(row[fields[key]])
+                    try:
+                        sub_instance = related_model.objects.get(**unique_kwargs)
+                    except related_model.DoesNotExist:
+                        sub_instance = related_model(**unique_kwargs)
+                        sub_instance.save()
 
                     if model_field.one_to_many or model_field.many_to_many:
                         getattr(instance, key).add(sub_instance)

@@ -55,19 +55,14 @@ class BaseCSVImportForm(forms.Form):
         if not len(fields):
             raise FieldParsingError()
 
-        rows_to_create = []
-        rows_to_update = []
-
         def process_row(row):
             # Fetch instance if it already exists, else create a new row.
-            row_exists = True
             instance = (
                 model_type.objects.filter(urlid=row["urlid"]).first()
                 if "urlid" in row
                 else None
             )
             if instance is None:
-                row_exists = False
                 instance = model_type()
 
             for key in fields.keys():
@@ -85,10 +80,8 @@ class BaseCSVImportForm(forms.Form):
                     else:
                         setattr(instance, key, sub_instance)
 
-            if row_exists:
-                rows_to_update.append(instance)
-            else:
-                rows_to_create.append(instance)
+            # NOTE: we can't use bulk_create or bulk_update here because we need post-save signals to run.
+            instance.save()
 
         # Workaround for performance:
         # We only want to process the fields once in the CSV, so we used next() once already to process them.
@@ -96,9 +89,6 @@ class BaseCSVImportForm(forms.Form):
         process_row(first_row)
         for row in imported_file:
             process_row(row)
-
-        model_type.objects.bulk_create(rows_to_create)
-        model_type.objects.bulk_update(rows_to_update, fields=fields.keys())
 
     def file_fields(self):
         return [

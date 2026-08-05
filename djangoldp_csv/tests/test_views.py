@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
+
 from djangoldp_csv.tests.enums import ProductType
 from djangoldp_csv.tests.models import Enterprise, SuppliedProduct
 

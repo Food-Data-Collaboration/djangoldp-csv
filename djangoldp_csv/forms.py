@@ -3,8 +3,8 @@ import io
 import logging
 
 from django import forms
-from djangoldp_csv.errors import FieldParsingError
 
+from djangoldp_csv.errors import FieldParsingError
 
 logger = logging.getLogger("djangoldp")
 
@@ -28,7 +28,7 @@ class BaseCSVImportForm(forms.Form):
         """Attempts to resolve a dictionary mapping model field names to RDF properties from the CSV"""
         fields = {}
 
-        for key in row.keys():
+        for key in row:
             model_field = model.get_field_from_rdf_type(key)
             if model_field is None:
                 # NOTE: A future version of DjangoLDP will provide a JSONField where we can store additional fields.
@@ -71,7 +71,7 @@ class BaseCSVImportForm(forms.Form):
             if instance is None:
                 instance = model_type()
 
-            for key in fields.keys():
+            for key in fields:
                 # Handle foreign keys
                 model_field = model_type.get_field_from_rdf_type(key)
                 if model_field.related_model is None:

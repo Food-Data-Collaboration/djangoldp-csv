@@ -1,6 +1,5 @@
 from django.db import models
 
-
 DFC_PT_URL = "https://github.com/datafoodconsortium/taxonomies/releases/latest/download/productTypes.rdf"
 
 

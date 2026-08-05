@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from djangoldp import fields
 from djangoldp.models import Model
-from djangoldp.permissions import ReadAndCreate, OwnerPermissions
+from djangoldp.permissions import OwnerPermissions, ReadAndCreate
 
 from .enums import ProductType
 

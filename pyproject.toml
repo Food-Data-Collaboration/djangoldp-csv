@@ -1,0 +1,3 @@
+[tool.ruff.lint.per-file-ignores]
+"djangoldp_csv/tests/models.py" = ["RUF012"]
+"djangoldp_csv/views.py" = ["RUF012"]

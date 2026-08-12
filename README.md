@@ -30,7 +30,7 @@ With the correct query parameters you can access the CSV upload for the appropri
 You can control which models are available in this list (and which can be targeted for CSV upload), using the setting `DJANGOLDP_CSV_MODELS`:
 
 ```python
-DJANGOLDP_CSV_MODELS = ["dfc-b:Enterprise", "dfc-b:Product"]
+DJANGOLDP_CSV_MODELS = ["dfc-b:Organization", "dfc-b:Product"]
 ```
 
 By default all models with configured RDF values are accepted.

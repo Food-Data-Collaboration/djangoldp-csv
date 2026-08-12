@@ -58,4 +58,4 @@ class Enterprise(Model):
     )  # xsd:String
 
     class Meta(Model.Meta):
-        rdf_type = "dfc-b:Enterprise"
+        rdf_type = "dfc-b:Organization"
